@@ -1,3 +1,6 @@
+/*! sektor v1.0.0 | (c) Stanko https://stanko.github.io/sektor/ | License: MIT */
+/* modified by Leonard Stefan https://github.com/leonard-stefan/ */
+
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -7,19 +10,22 @@ function Sektor(selector, options) {
 
   var defaultOptions = {
     size: 100,
-    stroke: 10,
+    sectorStroke: 4,
+    circleStroke: 8,
     arc: false,
-    angle: 225,
+    angle: 0,
     sectorColor: '#789',
     circleColor: '#DDD',
-    fillCircle: true
+    fillCircle: false
   };
 
   // Merge options with default ones
   options = _extends(defaultOptions, options);
 
   // Reset stroke to 0 if drawing full sector
-  options.stroke = options.arc ? options.stroke : 0;
+  options.stroke = options.arc ? Math.max(options.sectorStroke,options.circleStroke) : 0;
+  options.sectorStroke = options.arc ? options.sectorStroke : 0;
+  options.circleStroke = options.arc ? options.circleStroke : 0;
 
   // Circle dimenstions
   options.center = options.size / 2;
@@ -55,6 +61,7 @@ Sektor.prototype.step = function (angleOffset, endAngle, time, endTime) {
 
   if (timeOffset <= 0) {
     this.changeAngle(endAngle);
+    
   } else {
     var angle = endAngle - angleOffset * timeOffset / time;
 
@@ -64,6 +71,7 @@ Sektor.prototype.step = function (angleOffset, endAngle, time, endTime) {
     });
   }
 };
+
 
 Sektor.prototype.animateTo = function (angle) {
   var _this2 = this;
@@ -82,6 +90,7 @@ Sektor.prototype.animateTo = function (angle) {
     return _this2.step(angleOffset, angle, time, endTime);
   });
 };
+
 
 Sektor.prototype.getSector = function () {
   var returnD = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
@@ -118,14 +127,14 @@ Sektor.prototype.getSector = function () {
     return d;
   }
 
-  return '<path\n    class=\'Sektor-sector\'\n    stroke-width=\'' + options.stroke + '\'\n    fill=' + sectorFill + '\n    stroke=' + sectorStroke + '\n    d=\'' + d + '\' />';
+  return '<path\n    class=\'Sektor-sector\'\n    stroke-width=\'' + options.sectorStroke + '\'\n    fill=' + sectorFill + '\n    stroke=' + sectorStroke + '\n    d=\'' + d + '\' />';
 };
 
 Sektor.prototype.getCircle = function () {
   var options = this.options;
   var circleFill = options.fillCircle || !options.arc ? options.circleColor : 'none';
 
-  return '<circle\n      class=\'Sektor-circle\'\n      stroke-width=\'' + options.stroke + '\'\n      fill=' + circleFill + '\n      stroke=' + options.circleColor + '\n      cx=\'' + options.center + '\'\n      cy=\'' + options.center + '\'\n      r=\'' + options.radius + '\' />';
+  return '<circle\n      class=\'Sektor-circle\'\n      stroke-width=\'' + options.circleStroke + '\'\n      fill=' + circleFill + '\n      stroke=' + options.circleColor + '\n      cx=\'' + options.center + '\'\n      cy=\'' + options.center + '\'\n      r=\'' + options.radius + '\' />';
 };
 
 // Generates SVG arc string
