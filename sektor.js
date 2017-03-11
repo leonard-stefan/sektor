@@ -72,6 +72,26 @@ Sektor.prototype.step = function (angleOffset, endAngle, time, endTime) {
   }
 };
 
+Sektor.prototype.stepslim = function (widthOffset, endWidth, time, endTime) { /* test */
+  var _this = this;
+
+  var now = new Date().valueOf();
+  var timeOffset = endTime - now;
+
+  if (timeOffset <= 0) {
+    this.changeAngle(0);
+    this.sector.setAttribute('stroke-width', this.options.sectorStroke);
+
+  } else {
+    var width = endWidth - widthOffset * timeOffset / time;
+
+    //this.changeAngle(angle);
+    _this.sector.setAttribute('stroke-width', width);
+    requestAnimationFrame(function () {
+      return _this.stepslim(widthOffset, endWidth, time, endTime);
+    });
+  }
+};
 
 Sektor.prototype.animateTo = function (angle) {
   var _this2 = this;
@@ -91,7 +111,22 @@ Sektor.prototype.animateTo = function (angle) {
   });
 };
 
+Sektor.prototype.animateSlim = function () { /* testing */
+  //this.options.sectorStroke = 2;
+  var _this2 = this;
+  var time = 200;
+  var width = 0;
 
+  var startTime = new Date().valueOf();
+  var endTime = startTime + time;
+  var widthOffset = width - this.options.sectorStroke;
+  
+  requestAnimationFrame(function () {
+    return _this2.stepslim(widthOffset, width, time, endTime);
+  });
+  
+  
+}
 Sektor.prototype.getSector = function () {
   var returnD = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
