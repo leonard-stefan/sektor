@@ -53,7 +53,7 @@ Sektor.prototype.changeAngle = function (angle) {
   this.sector.setAttribute('d', this.getSector(true));
 };
 
-Sektor.prototype.step = function (angleOffset, endAngle, time, endTime) {
+Sektor.prototype.step = function (angleOffset, endAngle, time, endTime, callback) {
   var _this = this;
 
   var now = new Date().valueOf();
@@ -61,26 +61,27 @@ Sektor.prototype.step = function (angleOffset, endAngle, time, endTime) {
 
   if (timeOffset <= 0) {
     this.changeAngle(endAngle);
-    
+    callback();
   } else {
     var angle = endAngle - angleOffset * timeOffset / time;
 
     this.changeAngle(angle);
     requestAnimationFrame(function () {
-      return _this.step(angleOffset, endAngle, time, endTime);
+      return _this.step(angleOffset, endAngle, time, endTime, callback);
     });
   }
 };
 
-Sektor.prototype.stepslim = function (widthOffset, endWidth, time, endTime) { /* test */
+Sektor.prototype.stepslim = function (widthOffset, endWidth, time, endTime, callback) { /* test */
   var _this = this;
 
   var now = new Date().valueOf();
   var timeOffset = endTime - now;
 
   if (timeOffset <= 0) {
-    this.changeAngle(0);
+    //this.changeAngle(0);
     this.sector.setAttribute('stroke-width', this.options.sectorStroke);
+    callback();
 
   } else {
     var width = endWidth - widthOffset * timeOffset / time;
@@ -88,7 +89,7 @@ Sektor.prototype.stepslim = function (widthOffset, endWidth, time, endTime) { /*
     //this.changeAngle(angle);
     _this.sector.setAttribute('stroke-width', width);
     requestAnimationFrame(function () {
-      return _this.stepslim(widthOffset, endWidth, time, endTime);
+      return _this.stepslim(widthOffset, endWidth, time, endTime, callback);
     });
   }
 };
@@ -97,6 +98,7 @@ Sektor.prototype.animateTo = function (angle) {
   var _this2 = this;
 
   var time = arguments.length <= 1 || arguments[1] === undefined ? 300 : arguments[1];
+  var callback = arguments.length <= 2 || typeof arguments[2] !== "function" ? function() {} : arguments[2];
 
   if (angle > 360) {
     angle = angle % 360;
@@ -107,22 +109,25 @@ Sektor.prototype.animateTo = function (angle) {
   var angleOffset = angle - this.options.angle;
 
   requestAnimationFrame(function () {
-    return _this2.step(angleOffset, angle, time, endTime);
+    return _this2.step(angleOffset, angle, time, endTime, callback);
   });
 };
 
 Sektor.prototype.animateSlim = function () { /* testing */
   //this.options.sectorStroke = 2;
   var _this2 = this;
-  var time = 200;
-  var width = 0;
+
+  var width = arguments.length == 0 || arguments[0] === undefined ? 0 : arguments[0];
+  var time = arguments.length <= 1 || arguments[1] === undefined ? 200 : arguments[1];
+  var callback = arguments.length <= 2 || typeof arguments[2] !== "function" ? function() {} : arguments[2];
+  //console.log(arguments.length);
 
   var startTime = new Date().valueOf();
   var endTime = startTime + time;
   var widthOffset = width - this.options.sectorStroke;
   
   requestAnimationFrame(function () {
-    return _this2.stepslim(widthOffset, width, time, endTime);
+    return _this2.stepslim(widthOffset, width, time, endTime, callback);
   });
   
   
